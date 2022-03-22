@@ -1,4 +1,4 @@
-FROM php:8-cli as builder
+FROM php:8.0-cli as builder
 RUN apt update && apt install git -y
 WORKDIR /app
 RUN git clone https://github.com/osTicket/osTicket && \
@@ -14,7 +14,7 @@ RUN sed -i "s/define('OSTINSTALLED',FALSE);/define('OSTINSTALLED',TRUE);/" /app/
     sed -i "s/'%CONFIG-PREFIX'/getenv('TABLE_PREFIX')/" /app/osticket/include/ost-config.php && \
     rm -rf /app/osticket/setup 
 
-FROM php:8-apache
+FROM php:8.0-apache
 RUN docker-php-ext-install mysqli pdo pdo_mysql && docker-php-ext-enable pdo_mysql mysqli
 COPY --from=builder /app/osticket/ /var/www/html
 RUN chown -R www-data:www-data /var/www/html/
