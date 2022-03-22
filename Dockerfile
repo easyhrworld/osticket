@@ -15,4 +15,5 @@ RUN sed -i "s/define('OSTINSTALLED',FALSE);/define('OSTINSTALLED',TRUE);/" /app/
     rm -rf /app/osticket/setup 
 
 FROM php:7-apache
+RUN docker-php-ext-install mysqli pdo pdo_mysql && docker-php-ext-enable pdo_mysql mysqli
 COPY --from=builder /app/osticket/ /var/www/html
