@@ -1,8 +1,8 @@
-FROM php:8-cli as builder
+FROM php:7-cli as builder
 RUN apt update && apt install git -y
 WORKDIR /app
 RUN git clone https://github.com/osTicket/osTicket && \
-    cd osTicket && php manage.php deploy --setup /app/osticket/ && \
+    cd osTicket && git checkout tags/v1.15.3.1 && php manage.php deploy --setup /app/osticket/ && \
     mv /app/osticket/include/ost-sampleconfig.php /app/osticket/include/ost-config.php 
 RUN sed -i "s/define('OSTINSTALLED',FALSE);/define('OSTINSTALLED',TRUE);/" /app/osticket/include/ost-config.php && \
     sed -i "s/'%CONFIG-SIRI'/getenv('APP_KEY')/" /app/osticket/include/ost-config.php && \
@@ -14,7 +14,7 @@ RUN sed -i "s/define('OSTINSTALLED',FALSE);/define('OSTINSTALLED',TRUE);/" /app/
     sed -i "s/'%CONFIG-PREFIX'/getenv('TABLE_PREFIX')/" /app/osticket/include/ost-config.php && \
     rm -rf /app/osticket/setup 
 
-FROM php:8-apache
+FROM php:7-apache
 RUN docker-php-ext-install mysqli pdo pdo_mysql && docker-php-ext-enable pdo_mysql mysqli
 COPY --from=builder /app/osticket/ /var/www/html
 RUN chown -R www-data:www-data /var/www/html/
